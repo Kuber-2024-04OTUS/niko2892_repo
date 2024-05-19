@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: homework
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  strategy:
+   type: RollingUpdate
+   rollingUpdate:
+     maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      nodeSelector:
+          homework: "true"
+      initContainers:
+      - name: init-container
+        image: busybox:1.36.1
+        command: ["/bin/sh", "-c", "echo Hello, world! > /init/index.html && echo Hello from homepage > /init/homepage.html"]
+        volumeMounts:
+        - name: shared-data
+          mountPath: /init
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 8000
+        readinessProbe:
+          httpGet:
+            path: /index.html
+            port: 8000
+            scheme: HTTP
+        volumeMounts:
+        - name: shared-data
+          mountPath: /homework
+        - name: nginx-conf
+          mountPath: /etc/nginx/conf.d
+        - name: homework-4-conf
+          mountPath: /homework/conf
+        lifecycle:
+          preStop:
+            exec:
+              command: ["rm", "-f", "/homework/index.html"]
+      volumes:
+      - name: nginx-conf
+        configMap:
+          name: nginx-conf
+      - name: homework-4-conf
+        configMap:
+          name: homework-4-conf
+      - name: shared-data
+        persistentVolumeClaim:
+          claimName: homework-pvc
