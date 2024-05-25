@@ -1,0 +1,11 @@
+apiVersion: certificates.k8s.io/v1
+kind: CertificateSigningRequest
+metadata:
+  name: cd
+  namespace: homework
+spec:
+  request: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0NCk1JR2JNRThDQVFBd0hERUxNQWtHQTFVRUF3d0NZMlF4RFRBTEJnTlZCQW9NQkdWa2FYUXdLakFGQmdNclpYQUQNCklRQkR3RmYrc28vUXN2SDI0QzQ2bEJUWFhiNHVqaStmSDR4MjNSK3BuaFZKb2FBQU1BVUdBeXRsY0FOQkFMZ3UNCmY2UzlpcVlLT2lTOTdMUUNKeFdEVjRLell3akxXcVdBZllKVzFlU3pGTHQ1U2d3Zng2SzlIYS9RaEh4YkdlYmUNClk4eGErU1ZLaStNbndCblVXQXc9DQotLS0tLUVORCBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0NCg==
+  signerName: kubernetes.io/kube-apiserver-client
+  expirationSeconds: 86400  # 1 день
+  usages:
+  - client auth
