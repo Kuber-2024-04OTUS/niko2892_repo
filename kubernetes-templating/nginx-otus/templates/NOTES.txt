@@ -1,0 +1,4 @@
+Thank you for installing {{ .Chart.Name }}.
+
+Your application has been deployed to Kubernetes. You can access it:
+http://homework.otus
