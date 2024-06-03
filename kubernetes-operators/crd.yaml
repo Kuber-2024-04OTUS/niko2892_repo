@@ -1,0 +1,63 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: mysqls.otus.homework
+spec:
+  group: otus.homework
+  scope: Namespaced
+  names:
+    plural: mysqls
+    singular: mysql
+    kind: MySQL
+    shortNames:
+    - mysql
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            x-kubernetes-validations:
+            - rule: "type(self.image) == string"
+              message: "image must be string type."
+            - rule: "type(self.database) == string"
+              message: "database must be string type."
+            - rule: "type(self.password) == string"
+              message: "password must be string type."
+            - rule: "size(self.password) > 7"
+              message: "password must be more than 7 symbols length"
+            - rule: "type(self.storage_size) == string"
+              message: "storage_size must be string type."
+            properties:
+              image:
+                type: string
+              database:
+                type: string
+              password:
+                type: string
+              storage_size:
+                type: string
+              container_port:
+                type: integer
+            required:
+            - image
+            - database
+            - password
+            - storage_size
+    selectableFields:
+    - jsonPath: .spec.database
+    - jsonPath: .spec.storage_size
+    additionalPrinterColumns:
+    - jsonPath: .spec.image
+      name: image
+      type: string
+    - jsonPath: .spec.database
+      name: database
+      type: string
+    - jsonPath: .spec.storage_size
+      name: storage_size
+      type: string
