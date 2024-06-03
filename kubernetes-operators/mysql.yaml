@@ -1,0 +1,13 @@
+apiVersion: otus.homework/v1
+kind: MySQL
+metadata:
+  name: mysql-cr
+  namespace: homework
+  labels:
+    app: mysql-cr
+spec:
+  image: mysql
+  database: test
+  password: a2345678
+  storage_size: 1G
+  container_port: 3306
