@@ -10,6 +10,3 @@ kubectl apply -f namespace.yaml
 kubectl apply -f configmap-nginx.yaml *я добавил страницу-заглушку, чтобы /homepage не возвращал 404
 kubectl apply -f deployment.yaml
 kubectl apply -f ingress.yaml
-
-для проверки задания со * нужно раскоментировать path: /index.html и annotations (6 и 7 строки) в ingress.yaml
-и выполнить команду kubectl apply -f ingress.yaml
