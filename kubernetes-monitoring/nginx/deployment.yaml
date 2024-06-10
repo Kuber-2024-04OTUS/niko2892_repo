@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: homework
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  strategy:
+   type: RollingUpdate
+   rollingUpdate:
+     maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nvyakimov/my-nginx:v1.0.0
+        ports:
+        - containerPort: 80
+      - name: nginx-exporter
+        image: 'nginx/nginx-prometheus-exporter:1.1.0'
+        args:
+          - '-nginx.scrape-uri=http://homework.otus/nginx-metrics'
+        ports:
+        - containerPort: 9113
