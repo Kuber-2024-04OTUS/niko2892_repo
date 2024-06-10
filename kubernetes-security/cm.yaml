@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homework-4-conf
+  namespace: homework
+data:
+  health: "100"
+  player_initial_lives: "3"
+  ui_properties_file_name: "user-interface.properties"
+  power: "3000"
+  speed: "18"
