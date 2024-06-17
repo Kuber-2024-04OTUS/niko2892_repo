@@ -1,0 +1,8 @@
+config:
+  clients:
+    - url: http://loki-gateway.loki.svc.cluster.local/loki/api/v1/push
+      tenant_id: 1
+tolerations:
+  - effect: NoSchedule
+    key: infra
+    operator: Exists

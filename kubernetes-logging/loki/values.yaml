@@ -1,0 +1,72 @@
+global:
+  extraEnvFrom:
+    - secretRef: 
+        name: loki-s3-credentials
+deploymentMode: SingleBinary
+loki:
+  auth_enabled: false
+  commonConfig:
+    replication_factor: 1
+  storage:
+    bucketNames:
+      chunks: 'niko2892-loki-logs'
+    type: s3
+    s3:
+      s3: 'niko2892-loki-logs'
+      endpoint: 'https://storage.yandexcloud.net/'
+      region: 'ru-central1'
+      secretAccessKey: ${S3_SECRET_ACCESS_KEY_KEY}
+      accessKeyId: ${S3_ACCESS_KEY_ID}
+      s3ForcePathStyle: false
+  schemaConfig:
+    configs:
+    - from: "2024-01-01"
+      store: tsdb
+      index:
+        prefix: loki_index_
+        period: 24h
+      object_store: s3
+      schema: v13
+singleBinary:
+  replicas: 1
+  nodeSelector:
+    node-role.kubernetes.io/infra: infra
+  tolerations:
+    - effect: NoSchedule
+      key: infra
+      operator: Exists
+read:
+  replicas: 0
+backend:
+  replicas: 0
+write:
+  replicas: 0
+chunksCache:
+  allocatedMemory: 256
+  nodeSelector:
+    node-role.kubernetes.io/infra: infra
+  tolerations:
+    - effect: NoSchedule
+      key: infra
+      operator: Exists
+resultsCache:
+  nodeSelector:
+    node-role.kubernetes.io/infra: infra
+  tolerations:
+    - effect: NoSchedule
+      key: infra
+      operator: Exists
+gateway:
+  nodeSelector:
+    node-role.kubernetes.io/infra: infra
+  tolerations:
+    - effect: NoSchedule
+      key: infra
+      operator: Exists
+lokiCanary:
+  nodeSelector:
+    node-role.kubernetes.io/infra: infra
+  tolerations:
+    - effect: NoSchedule
+      key: infra
+      operator: Exists
