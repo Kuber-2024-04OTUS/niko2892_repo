@@ -206,15 +206,15 @@ ingress:
                   port:
                     number: 80
 configmap:
-  - metadata:
-      name: homework-4-conf
-      namespace: homework
-    data:
-      health: "100"
-      player_initial_lives: "3"
-      ui_properties_file_name: "user-interface.properties"
-      power: "3000"
-      speed: "18"
+  # - metadata:
+  #     name: homework-4-conf
+  #     namespace: homework
+  #   data:
+  #     health: "100"
+  #     player_initial_lives: "3"
+  #     ui_properties_file_name: "user-interface.properties"
+  #     power: "3000"
+  #     speed: "18"
   - metadata:
       name: nginx-otus-conf
       namespace: homework
