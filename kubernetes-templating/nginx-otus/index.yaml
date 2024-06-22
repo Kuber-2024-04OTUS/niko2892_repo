@@ -1,6 +1,0 @@
-apiVersion: v1
-entries:
-  nginx-otus:
-    version: 0.1.0
-    urls:
-    - https://raw.githubusercontent.com/Kuber-2024-04OTUS/niko2892_repo/main/kubernetes-templating/nginx-otus/nginx-otus-0.1.0.tgz
