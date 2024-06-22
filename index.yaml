@@ -1,0 +1,19 @@
+apiVersion: v1
+entries:
+  nginx-otus:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-06-22T16:19:36.7512133+03:00"
+    dependencies:
+    - condition: redis.enabled
+      name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: ^19.5.0
+    description: A Helm chart for Kubernetes
+    digest: b4801d063671a14aa96002873caa88e67d60313c1ab809d30a8f2612c72f733c
+    name: nginx-otus
+    type: application
+    urls:
+    - kubernetes-templating/nginx-otus/nginx-otus-0.1.0.tgz
+    version: 0.1.0
+generated: "2024-06-22T16:19:36.7397941+03:00"
