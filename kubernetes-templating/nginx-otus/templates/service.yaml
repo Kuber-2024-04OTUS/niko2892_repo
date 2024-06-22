@@ -1,0 +1,18 @@
+{{- range .Values.service  }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .metadata.name }}
+  namespace: {{  .metadata.namespace  }}
+spec:
+  type: {{  .spec.type  }}
+  selector:
+    {{- toYaml .spec.selector | nindent 4}}
+  ports:
+    {{- range $i, $port := .spec.ports  }}
+    - protocol: {{ $port.protocol }}
+      port: {{ $port.port }}
+      targetPort: {{ $port.targetPort }}
+    {{- end  }}
+---
+{{- end  }}
