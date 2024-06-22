@@ -3,4 +3,4 @@ entries:
   nginx-otus:
     version: 0.1.0
     urls:
-    - https://github.com/Kuber-2024-04OTUS/niko2892_repo/raw/main/kubernetes-templating/nginx-otus/Chart.yaml
+    - https://raw.githubusercontent.com/Kuber-2024-04OTUS/niko2892_repo/main/kubernetes-templating/nginx-otus/Chart.yaml
