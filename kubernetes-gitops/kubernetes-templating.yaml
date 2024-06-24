@@ -1,0 +1,277 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubernetes-templating
+  namespace: argocd
+spec:
+  project: otus
+  source:
+    repoURL: https://raw.githubusercontent.com/Kuber-2024-04OTUS/niko2892_repo/main/
+    targetRevision: "0.1.0"
+    path: /
+    chart: nginx-otus
+    helm:
+      # valueFiles:
+      #   - ./override-values.yaml
+      values: |
+        namespace:
+          - metadata:
+              name: homework-helm
+          - metadata:
+              name: kube-metrics
+        serviceAccount:
+          - metadata:
+              name: monitoring
+              namespace: homework-helm
+          - metadata:
+              name: kube-metrics-monitor
+              namespace: kube-metrics
+        role:
+          - metadata:
+              name: kube-metrics-monitor
+              namespace: kube-metrics
+            rules:
+              - apiGroups: ["metrics.k8s.io"]
+                resources:
+                  - pods
+                verbs: ["get", "list"]
+        roleBinding:
+          - metadata:
+              name: kube-metrics-monitor
+              namespace: kube-metrics
+            roleRef:
+              apiGroup: rbac.authorization.k8s.io
+              kind: Role
+              name: kube-metrics-monitor
+            subjects:
+              - kind: ServiceAccount
+                name: kube-metrics-monitor
+        clusterRole:
+          - metadata:  
+              name: monitoring-cluster-role
+            rules:
+              - nonResourceURLs: ["/metrics", "/index.html"]
+                verbs: ["get"]
+        clusterRoleBinding:
+          - metadata:
+              name: monitoring-crb
+            subjects:
+              - kind: ServiceAccount
+                name: monitoring
+                namespace: homework-helm
+            roleRef:
+              kind: ClusterRole
+              name: monitoring-cluster-role
+              apiGroup: rbac.authorization.k8s.io
+        pvc:
+          - metadata:
+              name: homework-pvc
+              namespace: homework-helm
+            spec:
+              storageClassName: "yc-network-hdd"
+              accessModes:
+                - ReadWriteOnce
+              resources:
+              requests:
+                storage: 1Gi
+        deployment:
+          - metadata:
+              name: nginx-otus
+              namespace: homework-helm 
+            spec:
+              replicas: 2
+              strategy:
+                type: RollingUpdate
+                rollingUpdate:
+                  maxUnavailable: 1
+              template:
+                spec:
+                  serviceAccount: monitoring
+                  nodeSelector:
+                    homework: "true"
+                  initContainers:
+                    - name: init-container
+                      securityContext:
+                        runAsUser: 0
+                        runAsGroup: 0
+                      image: curlimages/curl:8.8.0
+                      command: 
+                        - /bin/sh
+                        - -c
+                        - |
+                          echo Hello World! > /init/index.html && \
+                          echo /init/index.html writed && \
+                          echo Hello from homepage! > /init/homepage.html && \
+                          echo /init/homepage.html writed && \
+                          curl -sv kube-metrics-exporter-service.kube-metrics.svc.cluster.local/metrics > /init/metrics.html && \
+                          echo /init/metrics.html writed
+                      volumeMounts:
+                      - name: shared-data
+                        mountPath: /init
+                  containers:
+                  - name: nginx
+                    image: nginx
+                    tag: "1.14.2"
+                    ports:
+                    - containerPort: 8000
+                    readinessProbe:
+                      enabled: true
+                      httpGet:
+                        path: /metrics.html
+                        port: 8000
+                        scheme: HTTP
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    volumeMounts:
+                    - name: shared-data
+                      mountPath: /homework
+                    - name: nginx-otus-conf
+                      mountPath: /etc/nginx/conf.d
+                    - name: homework-4-conf
+                      mountPath: /homework/conf
+                    lifecycle:
+                      preStop:
+                        exec:
+                          command: ["rm", "-f", "/homework/index.html"]
+                  volumes:
+                  - name: nginx-otus-conf
+                    configMap:
+                      name: nginx-otus-conf
+                  - name: homework-4-conf
+                    configMap:
+                      name: homework-4-conf
+                  - name: shared-data
+                    persistentVolumeClaim:
+                      claimName: homework-pvc
+          - metadata:
+              name: kube-metrics-exporter
+              namespace: kube-metrics
+              labels:
+                app: kube-metrics-exporter
+            spec:
+              replicas: 1
+              selector:
+                matchLabels:
+                  app: kube-metrics-exporter
+              template:
+                metadata:
+                  labels:
+                    app: kube-metrics-exporter
+                spec:
+                  serviceAccountName: kube-metrics-monitor
+                  containers:
+                  - name: kube-metrics-exporter
+                    image: itzg/kube-metrics-exporter
+                    env:
+                      - name: NAMESPACE
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: metadata.namespace
+        service:
+          - metadata:
+              name: kube-metrics-exporter-service
+              namespace: kube-metrics
+            spec:
+              type: ClusterIP
+              selector:
+                app: kube-metrics-exporter
+              ports:
+                - protocol: TCP
+                  port: 80
+                  targetPort: 8080
+          - metadata:
+              name: nginx-otus-service
+              namespace: homework-helm
+            spec:
+              type: ClusterIP
+              selector: 
+                app: nginx-otus
+              ports:
+                - protocol: TCP
+                  port: 80
+                  targetPort: 8000
+        ingress:
+          - metadata:
+              name: nginx-otus-ingress
+              namespace: homework-helm
+            spec:
+              ingressClassName: nginx
+              rules:
+                - host: homework.otus
+                  http:
+                    paths:
+                    - path: /metrics
+                      pathType: Prefix
+                      backend:
+                        service:
+                          name: nginx-otus-service
+                          port:
+                            number: 80
+                    - path: /
+                      pathType: Prefix
+                      backend:
+                        service:
+                          name: nginx-otus-service
+                          port:
+                            number: 80
+        configmap:
+          - metadata:
+              name: homework-4-conf
+              namespace: homework-helm
+            data:
+              health: "100"
+              player_initial_lives: "3"
+              ui_properties_file_name: "user-interface.properties"
+              power: "3000"
+              speed: "18"
+          - metadata:
+              name: nginx-otus-conf
+              namespace: homework-helm
+            data:
+              nginx.conf: |
+                server {
+                listen       8000;
+                listen  [::]:8000;
+                server_name  localhost;
+                #access_log  /var/log/nginx/host.access.log  main;
+                
+                location / {
+                  root /homework;
+                  index index.php;
+                  autoindex on;
+                  autoindex_localtime on;
+                  autoindex_exact_size off;
+                  charset   utf-8;
+                }
+                location /homepage {
+                  root /homework;
+                  try_files $uri $uri/ /homepage.html;
+                }
+                location /metrics {
+                  root /homework;
+                  try_files $uri $uri/ /metrics.html;
+                }
+                location ~/conf/ {
+                  autoindex on;
+                  root /homework;
+                  default_type "text/html";
+                }
+                
+                # error_page  404              /404.html;
+                # redirect server error pages to the static page /50x.html
+                error_page   500 502 503 504  /50x.html;
+                
+                location = /50x.html {
+                    root   /usr/share/nginx/html;
+                  }
+                }
+        redis:
+          enabled: false
+          namespaceOverride: homework-helm
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: homework-helm
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

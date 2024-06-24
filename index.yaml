@@ -3,7 +3,7 @@ entries:
   nginx-otus:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-06-22T14:18:37.2452266+03:00"
+    created: "2024-06-22T16:19:36.7512133+03:00"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -14,6 +14,6 @@ entries:
     name: nginx-otus
     type: application
     urls:
-    - nginx-otus/nginx-otus-0.1.0.tgz
+    - kubernetes-templating/nginx-otus/nginx-otus-0.1.0.tgz
     version: 0.1.0
-generated: "2024-06-22T14:18:37.2397167+03:00"
+generated: "2024-06-22T16:19:36.7397941+03:00"
