@@ -1,0 +1,48 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubernetes-templating
+  namespace: argocd
+spec:
+  project: otus
+  source:
+    repoURL: 'https://github.com/Kuber-2024-04OTUS/niko2892_repo.git'
+    targetRevision: 'kubernetes-templating'
+    path: kubernetes-templating/nginx-otus
+    helm:
+      valueFiles:
+        - values.yaml
+      parameters:
+        - name: namespace[0].metadata.name
+          value: homework-helm
+        - name: serviceAccount[0].metadata.namespace
+          value: homework-helm
+        - name: clusterRoleBinding[0].subjects[0].namespace
+          value: homework-helm
+        - name: storageClass[0].metadata.namespace
+          value: homework-helm
+        - name: pvc[0].metadata.namespace
+          value: homework-helm
+        - name: pvc[0].spec.storageClassName
+          value: yc-network-hdd
+        - name: deployment[0].metadata.namespace
+          value: homework-helm
+        - name: deployment[0].spec.replicas
+          value: '2'
+        - name: service[1].metadata.namespace
+          value: homework-helm
+        - name: ingress[0].metadata.namespace
+          value: homework-helm
+        - name: configmap[0].metadata.namespace
+          value: homework-helm
+        - name: configmap[1].metadata.namespace
+          value: homework-helm
+        - name: redis.namespaceOverride
+          value: homework-helm
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: homework-helm
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
