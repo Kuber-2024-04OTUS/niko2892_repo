@@ -14,6 +14,7 @@ spec:
   sourceRepos:
   - 'https://github.com/Kuber-2024-04OTUS/niko2892_repo.git'
   - 'https://raw.githubusercontent.com/Kuber-2024-04OTUS/niko2892_repo/main/'
+  - 'git@github.com:Kuber-2024-04OTUS/niko2892_repo.git'
 
   # Only permit applications to deploy to the guestbook namespace in the same cluster
   # Destination clusters can be identified by 'server', 'name', or both.
