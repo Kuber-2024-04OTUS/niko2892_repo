@@ -27,6 +27,8 @@ spec:
           value: yc-network-hdd
         - name: deployment[0].metadata.namespace
           value: homework-helm
+        - name: deployment[0].spec.replicas
+          value: '2'
         - name: service[1].metadata.namespace
           value: homework-helm
         - name: ingress[0].metadata.namespace
