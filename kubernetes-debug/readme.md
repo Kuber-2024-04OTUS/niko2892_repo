@@ -44,3 +44,13 @@ quest: \"GET /favicon.ico HTTP/1.1\", host: \"localhost:53630\", referrer: \"htt
 {"log":"127.0.0.1 - - [16/Sep/2024:19:14:49 +0800] \"GET / HTTP/1.1\" 304 0 \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chr
 ome/128.0.0.0 Safari/537.36 Edg/128.0.0.0\" \"-\"\n","stream":"stdout","time":"2024-09-16T11:14:49.510199361Z"}
 ```
+
+9) Выполнить strace:
+kubectl debug -it nginx-distroless -n homework --image=nicolaka/netshoot --target=nginx --share-processes
+
+попробовал в отладочном контейнере запустить strace -p 1
+в результате получил:
+strace: Process 1 attached
+rt_sigsuspend([], 8
+
+это и требовалось в задании. похоже, эфимерный контейнер по дефолту запускается с general профилем https://github.com/kubernetes/enhancements/tree/master/keps/sig-cli/1441-kubectl-debug#debugging-profiles
