@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-with-csi
+  labels:
+    app: nginx-with-csi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-with-csi
+  template:
+    metadata:
+      labels:
+        app: nginx-with-csi
+    spec:
+      containers:
+      - name: nginx-with-csi
+        image: nginx
+        volumeMounts:
+          - mountPath: /usr/share/nginx/html/
+            name: csi
+      volumes:
+      - name: csi
+        persistentVolumeClaim:
+          claimName: kube-csi-s3-pvc
+          readOnly: false
